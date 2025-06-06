@@ -1,12 +1,11 @@
-
 package proyectoprogra3;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-
 public class RegistroVehiculosGT extends javax.swing.JFrame {
-private Arboles arbolABB; // Árbol binario de búsqueda (ABB)
-private ArbolesAVL arbolAVL; // Árbol AVL
+    private Arboles arbolABB; // Árbol binario de búsqueda (ABB)
+    private ArbolesAVL arbolAVL; // Árbol AVL
 
     public RegistroVehiculosGT() {
         initComponents();
@@ -19,7 +18,8 @@ private ArbolesAVL arbolAVL; // Árbol AVL
         // Mostrar datos iniciales con recorrido inorden para ambos árboles
         actualizarTabla("inorden", "ABB");
         actualizarTabla("inorden", "AVL");
-    }
+    } 
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -36,6 +36,8 @@ private ArbolesAVL arbolAVL; // Árbol AVL
         PreOrdenAVL = new javax.swing.JButton();
         InOrdenAVL = new javax.swing.JButton();
         PostOrdenAVL = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        VerInfo = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -105,6 +107,15 @@ private ArbolesAVL arbolAVL; // Árbol AVL
             }
         });
 
+        jLabel3.setText("Ver info de MT");
+
+        VerInfo.setText("Ver info");
+        VerInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                VerInfoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -126,17 +137,30 @@ private ArbolesAVL arbolAVL; // Árbol AVL
                         .addComponent(InOrdenABB)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(PostOrdenABB))
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 572, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(119, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 572, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(VerInfo))))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(VerInfo)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(PreOrdenABB)
@@ -180,6 +204,35 @@ private ArbolesAVL arbolAVL; // Árbol AVL
     private void PostOrdenAVLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PostOrdenAVLActionPerformed
         actualizarTabla("postorden", "AVL");
     }//GEN-LAST:event_PostOrdenAVLActionPerformed
+
+    private void VerInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerInfoActionPerformed
+        {                                        
+        // Verificar si hay una fila seleccionada en alguna de las tablas
+        int selectedRowABB = TablaABB.getSelectedRow();
+        int selectedRowAVL = TablaAVL.getSelectedRow();
+
+        if (selectedRowABB == -1 && selectedRowAVL == -1) {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona un vehículo en la tabla ABB o AVL.");
+            return;
+        }
+
+        // Obtener placa y departamento de la tabla seleccionada
+        String placa;
+        String departamento;
+        if (selectedRowABB != -1) {
+            placa = (String) TablaABB.getValueAt(selectedRowABB, 0); // Columna 0: Placa
+            departamento = (String) TablaABB.getValueAt(selectedRowABB, 8); // Columna 8: Departamento
+        } else {
+            placa = (String) TablaAVL.getValueAt(selectedRowAVL, 0); // Columna 0: Placa
+            departamento = (String) TablaAVL.getValueAt(selectedRowAVL, 8); // Columna 8: Departamento
+        }
+
+        // Abrir la ventana Informacion y cargar los datos
+        Informacion informacion = new Informacion();
+        informacion.cargarDatos(placa, departamento);
+        informacion.setVisible(true);
+    }     
+    }//GEN-LAST:event_VerInfoActionPerformed
 
  private void actualizarTabla(String tipoRecorrido, String tipoArbol) {
         DefaultTableModel modelo;
@@ -235,8 +288,8 @@ private ArbolesAVL arbolAVL; // Árbol AVL
         }
 
         java.awt.EventQueue.invokeLater(() -> new RegistroVehiculosGT().setVisible(true));
-    }
-
+    }    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton InOrdenABB;
     private javax.swing.JButton InOrdenAVL;
@@ -246,8 +299,10 @@ private ArbolesAVL arbolAVL; // Árbol AVL
     private javax.swing.JButton PreOrdenAVL;
     private javax.swing.JTable TablaABB;
     private javax.swing.JTable TablaAVL;
+    private javax.swing.JButton VerInfo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
