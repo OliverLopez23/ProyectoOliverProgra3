@@ -13,7 +13,6 @@ public class ArbolesAVL {
         raiz = null;
     }
 
-    // Método para obtener la altura de un nodo
     private int getAltura(NodoVehiculo nodo) {
         if (nodo == null) {
             return 0;
@@ -21,12 +20,10 @@ public class ArbolesAVL {
         return nodo.altura;
     }
 
-    // Método para actualizar la altura de un nodo
     private void actualizarAltura(NodoVehiculo nodo) {
         nodo.altura = Math.max(getAltura(nodo.hijoIzquierdo), getAltura(nodo.hijoDerecho)) + 1;
     }
 
-    // Método para obtener el factor de balance
     private int getFactorBalance(NodoVehiculo nodo) {
         if (nodo == null) {
             return 0;
@@ -34,7 +31,6 @@ public class ArbolesAVL {
         return getAltura(nodo.hijoIzquierdo) - getAltura(nodo.hijoDerecho);
     }
 
-    // Rotación a la derecha
     private NodoVehiculo rotacionDerecha(NodoVehiculo y) {
         NodoVehiculo x = y.hijoIzquierdo;
         NodoVehiculo T2 = x.hijoDerecho;
@@ -48,7 +44,6 @@ public class ArbolesAVL {
         return x;
     }
 
-    // Rotación a la izquierda
     private NodoVehiculo rotacionIzquierda(NodoVehiculo x) {
         NodoVehiculo y = x.hijoDerecho;
         NodoVehiculo T2 = y.hijoIzquierdo;
@@ -62,7 +57,6 @@ public class ArbolesAVL {
         return y;
     }
 
-    // Método para insertar un nodo recursivamente
     private NodoVehiculo insertarNodoRecursivo(NodoVehiculo nodo, String placa, String dpi, String nombre, 
                                               String marca, String modelo, int ano, int multas, 
                                               int traspasos, String departamento) {
@@ -77,30 +71,23 @@ public class ArbolesAVL {
             nodo.hijoDerecho = insertarNodoRecursivo(nodo.hijoDerecho, placa, dpi, nombre, marca, 
                                                      modelo, ano, multas, traspasos, departamento);
         } else {
-            // Handle duplicate placa (skip for now)
             return nodo;
         }
 
-        // Actualizar altura
         actualizarAltura(nodo);
 
-        // Calcular factor de balance
         int balance = getFactorBalance(nodo);
 
-        // Left-Left Case
         if (balance > 1 && placa.compareTo(nodo.hijoIzquierdo.placa) < 0) {
             return rotacionDerecha(nodo);
         }
-        // Right-Right Case
         if (balance < -1 && placa.compareTo(nodo.hijoDerecho.placa) > 0) {
             return rotacionIzquierda(nodo);
         }
-        // Left-Right Case
         if (balance > 1 && placa.compareTo(nodo.hijoIzquierdo.placa) > 0) {
             nodo.hijoIzquierdo = rotacionIzquierda(nodo.hijoIzquierdo);
             return rotacionDerecha(nodo);
         }
-        // Right-Left Case
         if (balance < -1 && placa.compareTo(nodo.hijoDerecho.placa) < 0) {
             nodo.hijoDerecho = rotacionDerecha(nodo.hijoDerecho);
             return rotacionIzquierda(nodo);
@@ -109,18 +96,15 @@ public class ArbolesAVL {
         return nodo;
     }
 
-    // Método público para insertar un nodo
     public void insertarNodo(String placa, String dpi, String nombre, String marca, String modelo, 
                              int ano, int multas, int traspasos, String departamento) {
         raiz = insertarNodoRecursivo(raiz, placa, dpi, nombre, marca, modelo, ano, multas, traspasos, departamento);
     }
 
-    // Método para verificar si el árbol está vacío
     public boolean estaVacio() {
         return raiz == null;
     }
 
-    // Recorrido preorden
     public void preOrden(NodoVehiculo r, DefaultTableModel modelo) {
         if (r != null) {
             modelo.addRow(new Object[]{r.placa, r.dpi, r.nombre, r.marca, r.modelo, 
@@ -130,7 +114,6 @@ public class ArbolesAVL {
         }
     }
 
-    // Recorrido inorden
     public void inOrden(NodoVehiculo r, DefaultTableModel modelo) {
         if (r != null) {
             inOrden(r.hijoIzquierdo, modelo);
@@ -140,7 +123,6 @@ public class ArbolesAVL {
         }
     }
 
-    // Recorrido postorden
     public void postOrden(NodoVehiculo r, DefaultTableModel modelo) {
         if (r != null) {
             postOrden(r.hijoIzquierdo, modelo);
@@ -150,7 +132,6 @@ public class ArbolesAVL {
         }
     }
 
-    // Método para leer archivos <departamento>_vehiculos.txt desde la carpeta principal y subcarpetas
     public void leerArchivos(String rutaCarpeta) {
         File carpetaPrincipal = new File(rutaCarpeta);
         if (!carpetaPrincipal.exists() || !carpetaPrincipal.isDirectory()) {
@@ -208,8 +189,23 @@ public class ArbolesAVL {
         }
     }
 
-    // Método para obtener la raíz
     public NodoVehiculo getRaiz() {
         return raiz;
+    }
+
+    // Método para buscar un vehículo por placa
+    public NodoVehiculo buscarPorPlaca(String placa) {
+        NodoVehiculo actual = raiz;
+        while (actual != null) {
+            int comparacion = placa.compareTo(actual.placa);
+            if (comparacion == 0) {
+                return actual;
+            } else if (comparacion < 0) {
+                actual = actual.hijoIzquierdo;
+            } else {
+                actual = actual.hijoDerecho;
+            }
+        }
+        return null;
     }
 }

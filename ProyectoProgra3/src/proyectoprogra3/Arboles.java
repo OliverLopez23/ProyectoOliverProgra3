@@ -13,7 +13,6 @@ public class Arboles {
         raiz = null;
     }
 
-    // Método para insertar un nodo en el árbol
     public void insertarNodo(String placa, String dpi, String nombre, String marca, String modelo, 
                             int ano, int multas, int traspasos, String departamento) {
         NodoVehiculo nuevo = new NodoVehiculo(placa, dpi, nombre, marca, modelo, ano, multas, traspasos, departamento);
@@ -41,12 +40,10 @@ public class Arboles {
         }
     }
 
-    // Método para verificar si el árbol está vacío
     public boolean estaVacio() {
         return raiz == null;
     }
 
-    // Recorrido preorden
     public void preOrden(NodoVehiculo r, DefaultTableModel modelo) {
         if (r != null) {
             modelo.addRow(new Object[]{r.placa, r.dpi, r.nombre, r.marca, r.modelo, 
@@ -56,7 +53,6 @@ public class Arboles {
         }
     }
 
-    // Recorrido inorden
     public void inOrden(NodoVehiculo r, DefaultTableModel modelo) {
         if (r != null) {
             inOrden(r.hijoIzquierdo, modelo);
@@ -66,7 +62,6 @@ public class Arboles {
         }
     }
 
-    // Recorrido postorden
     public void postOrden(NodoVehiculo r, DefaultTableModel modelo) {
         if (r != null) {
             postOrden(r.hijoIzquierdo, modelo);
@@ -76,7 +71,6 @@ public class Arboles {
         }
     }
 
-    // Método para leer archivos <departamento>_vehiculos.txt desde la carpeta principal y subcarpetas
     public void leerArchivos(String rutaCarpeta) {
         File carpetaPrincipal = new File(rutaCarpeta);
         if (!carpetaPrincipal.exists() || !carpetaPrincipal.isDirectory()) {
@@ -134,8 +128,23 @@ public class Arboles {
         }
     }
 
-    // Método para obtener la raíz
     public NodoVehiculo getRaiz() {
         return raiz;
+    }
+
+    // Método para buscar un vehículo por placa
+    public NodoVehiculo buscarPorPlaca(String placa) {
+        NodoVehiculo actual = raiz;
+        while (actual != null) {
+            int comparacion = placa.compareTo(actual.placa);
+            if (comparacion == 0) {
+                return actual;
+            } else if (comparacion < 0) {
+                actual = actual.hijoIzquierdo;
+            } else {
+                actual = actual.hijoDerecho;
+            }
+        }
+        return null;
     }
 }
