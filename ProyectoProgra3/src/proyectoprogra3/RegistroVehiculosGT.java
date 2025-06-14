@@ -7,6 +7,7 @@ public class RegistroVehiculosGT extends javax.swing.JFrame {
     private Arboles arbolABB;
     private ArbolesAVL arbolAVL;
     private InformacionMT informacionMT;
+    private UtilidadesExportacion utilidadesExportacion; // Nueva instancia
 
     public RegistroVehiculosGT() {
         initComponents();
@@ -14,6 +15,7 @@ public class RegistroVehiculosGT extends javax.swing.JFrame {
         informacionMT = new InformacionMT(rutaCarpeta);
         arbolABB = new Arboles();
         arbolAVL = new ArbolesAVL();
+        utilidadesExportacion = new UtilidadesExportacion(); // Inicializar utilidades
         arbolABB.leerArchivos(rutaCarpeta);
         arbolAVL.leerArchivos(rutaCarpeta);
         actualizarTabla("inorden", "ABB");
@@ -49,6 +51,8 @@ public class RegistroVehiculosGT extends javax.swing.JFrame {
         jTextField3 = new javax.swing.JTextField();
         ModificarVehiculo = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        Exportar = new javax.swing.JButton();
+        Encriptar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -168,6 +172,20 @@ public class RegistroVehiculosGT extends javax.swing.JFrame {
             }
         });
 
+        Exportar.setText("Exportar");
+        Exportar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ExportarActionPerformed(evt);
+            }
+        });
+
+        Encriptar.setText("Encriptar");
+        Encriptar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EncriptarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -212,7 +230,9 @@ public class RegistroVehiculosGT extends javax.swing.JFrame {
                                     .addComponent(EliminarVehiculo)
                                     .addComponent(AgregarVehiculo)
                                     .addComponent(ModificarVehiculo)
-                                    .addComponent(jButton2)))))
+                                    .addComponent(jButton2)
+                                    .addComponent(Exportar)
+                                    .addComponent(Encriptar)))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(43, 43, 43)
@@ -230,7 +250,7 @@ public class RegistroVehiculosGT extends javax.swing.JFrame {
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(7, 7, 7)
                         .addComponent(jLabel1)
@@ -240,17 +260,21 @@ public class RegistroVehiculosGT extends javax.swing.JFrame {
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(VerInfo)
-                        .addGap(54, 54, 54)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(56, 56, 56)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(AgregarVehiculo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(EliminarVehiculo)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(EliminarVehiculo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(ModificarVehiculo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(PreOrdenABB)
                             .addComponent(InOrdenABB)
@@ -265,10 +289,11 @@ public class RegistroVehiculosGT extends javax.swing.JFrame {
                             .addComponent(InOrdenAVL)
                             .addComponent(PostOrdenAVL)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(ModificarVehiculo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
-                        .addGap(18, 18, 18)
+                        .addComponent(Exportar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Encriptar)
+                        .addGap(34, 34, 34)
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -486,6 +511,23 @@ public class RegistroVehiculosGT extends javax.swing.JFrame {
         new Estadistica().setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void ExportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExportarActionPerformed
+       DefaultTableModel modeloAVL = (DefaultTableModel) TablaAVL.getModel();
+        if (modeloAVL.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "La tabla AVL está vacía. No hay datos para exportar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        utilidadesExportacion.exportarTablaAVL(modeloAVL, utilidadesExportacion.estanDatosEncriptados());
+    }//GEN-LAST:event_ExportarActionPerformed
+
+    private void EncriptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EncriptarActionPerformed
+        DefaultTableModel modeloABB = (DefaultTableModel) TablaABB.getModel();
+        DefaultTableModel modeloAVL = (DefaultTableModel) TablaAVL.getModel();
+        utilidadesExportacion.toggleEncriptacionTablas(modeloABB, modeloAVL);
+        // Actualizar texto del botón según el estado
+        Encriptar.setText(utilidadesExportacion.estanDatosEncriptados() ? "Desencriptar" : "Encriptar");
+    }//GEN-LAST:event_EncriptarActionPerformed
+
 private void actualizarTabla(String tipoRecorrido, String tipoArbol) {
         DefaultTableModel modelo;
         if (tipoArbol.equals("ABB")) {
@@ -558,6 +600,8 @@ private void actualizarTabla(String tipoRecorrido, String tipoArbol) {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AgregarVehiculo;
     private javax.swing.JButton EliminarVehiculo;
+    private javax.swing.JButton Encriptar;
+    private javax.swing.JButton Exportar;
     private javax.swing.JButton InOrdenABB;
     private javax.swing.JButton InOrdenAVL;
     private javax.swing.JButton ModificarVehiculo;
