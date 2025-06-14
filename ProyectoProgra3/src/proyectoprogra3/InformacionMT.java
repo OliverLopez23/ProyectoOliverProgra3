@@ -74,6 +74,48 @@ public class InformacionMT {
         }
     }
 
+    public boolean actualizarVehiculo(String departamento, String placa, String dpi, String nombre, String marca, String modelo, int ano) {
+        String rutaArchivo = rutaCarpetaPrincipal + "\\" + departamento + "\\" + departamento + "_vehiculos.txt";
+        File inputFile = new File(rutaArchivo);
+        File tempFile = new File(rutaArchivo + ".tmp");
+        boolean found = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] datos = line.split(",");
+                if (datos.length == 8 && datos[0].trim().equals(placa)) {
+                    found = true;
+                    writer.write(String.format("%s,%s,%s,%s,%s,%d,%d,%d%n",
+                        placa, dpi, nombre, marca, modelo, ano,
+                        Integer.parseInt(datos[6].trim()), // Conservar multas
+                        Integer.parseInt(datos[7].trim()))); // Conservar traspasos
+                } else {
+                    writer.write(line + "\n");
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al actualizar el vehículo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            tempFile.delete();
+            return false;
+        }
+
+        if (!found) {
+            JOptionPane.showMessageDialog(null, "Vehículo no encontrado para actualizar.", "Error", JOptionPane.ERROR_MESSAGE);
+            tempFile.delete();
+            return false;
+        }
+
+        if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
+            JOptionPane.showMessageDialog(null, "Error al actualizar el archivo de vehículos.", "Error", JOptionPane.ERROR_MESSAGE);
+            tempFile.delete();
+            return false;
+        }
+
+        return true;
+    }
+
     public void cargarMultas(String departamento) {
         if (multasPorDepartamento.containsKey(departamento)) {
             return;

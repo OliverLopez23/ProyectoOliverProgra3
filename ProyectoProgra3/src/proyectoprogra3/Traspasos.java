@@ -3,32 +3,62 @@ package proyectoprogra3;
 import javax.swing.JOptionPane;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class Traspasos extends javax.swing.JFrame {
     private String placa;
     private String departamento;
     private ListaCircularTraspasos listaTraspasos;
     private InformacionMT informacionMT;
+    private boolean modoModificar;
+    private String dpiAntOriginal;
+    private String nombreAntOriginal;
+    private String fechaOriginal;
+    private String dpiNewOriginal;
+    private String nombreNewOriginal;
 
     public Traspasos(String placa, String departamento, ListaCircularTraspasos listaTraspasos, InformacionMT informacionMT, String dpiAnt, String nombreAnt) {
+        this(placa, departamento, listaTraspasos, informacionMT, false, dpiAnt, nombreAnt, null, null, null);
+    }
+
+    public Traspasos(String placa, String departamento, ListaCircularTraspasos listaTraspasos, InformacionMT informacionMT, 
+                     boolean modoModificar, String dpiAnt, String nombreAnt, String fecha, String dpiNew, String nombreNew) {
         this.placa = placa;
         this.departamento = departamento;
         this.listaTraspasos = listaTraspasos;
         this.informacionMT = informacionMT;
+        this.modoModificar = modoModificar;
+        this.dpiAntOriginal = dpiAnt;
+        this.nombreAntOriginal = nombreAnt;
+        this.fechaOriginal = fecha;
+        this.dpiNewOriginal = dpiNew;
+        this.nombreNewOriginal = nombreNew;
         initComponents();
         jTextField1.setText(placa);
         jTextField1.setEditable(false);
-        jTextField2.setText(dpiAnt);
-        jTextField2.setEditable(false);
-        jTextField3.setText(nombreAnt);
-        jTextField3.setEditable(false);
-        // Establecer la fecha actual en jTextField4 (formato YYYY-MM-DD)
-        LocalDate fechaActual = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        jTextField4.setText(fechaActual.format(formatter));
+        if (modoModificar) {
+            jLabel1.setText("Modificar Traspaso");
+            jButton2.setText("Modificar");
+            jTextField2.setText(dpiAnt);
+            jTextField2.setEditable(false);
+            jTextField3.setText(nombreAnt);
+            jTextField3.setEditable(false);
+            jTextField4.setText(fecha);
+            jTextField5.setText(dpiNew);
+            jTextField6.setText(nombreNew);
+        } else {
+            jTextField2.setText(dpiAnt);
+            jTextField2.setEditable(false);
+            jTextField3.setText(nombreAnt);
+            jTextField3.setEditable(false);
+            LocalDate fechaActual = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            jTextField4.setText(fechaActual.format(formatter));
+            jTextField5.setText("");
+            jTextField6.setText("");
+        }
         setLocationRelativeTo(null);
     }
+    
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -99,33 +129,29 @@ public class Traspasos extends javax.swing.JFrame {
                         .addGap(78, 78, 78)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
                                 .addGap(245, 245, 245)
                                 .addComponent(jButton2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 3, Short.MAX_VALUE)))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 3, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel7))
+                                .addGap(130, 130, 130)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jTextField5)
+                                    .addComponent(jTextField6)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel5))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jTextField4, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                                    .addComponent(jTextField3)
+                                    .addComponent(jTextField2)
+                                    .addComponent(jTextField1))))))
                 .addGap(164, 164, 164))
             .addGroup(layout.createSequentialGroup()
                 .addGap(69, 69, 69)
@@ -178,34 +204,23 @@ public class Traspasos extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
                                               
     String dpiAnt = jTextField2.getText().trim();
-    String nombreAnt = jTextField3.getText().trim();
-    String fecha = jTextField4.getText().trim();
-    String dpiNew = jTextField5.getText().trim();
-    String nombreNew = jTextField6.getText().trim();
+        String nombreAnt = jTextField3.getText().trim();
+        String fecha = jTextField4.getText().trim();
+        String dpiNew = jTextField5.getText().trim();
+        String nombreNew = jTextField6.getText().trim();
 
-    // Validar DPI (ejemplo: 13 dígitos)
-    if (!dpiNew.matches("\\d{13}")) {
-        JOptionPane.showMessageDialog(this, "DPI nuevo debe tener 13 dígitos.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    if (dpiNew.equals(dpiAnt)) {
-        JOptionPane.showMessageDialog(this, "DPI nuevo debe ser diferente al DPI anterior.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
-    // Validar formato de fecha (yyyy-MM-dd)
-    try {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate.parse(fecha, formatter);
-    } catch (DateTimeParseException e) {
-        JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use yyyy-MM-dd.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
-    if (listaTraspasos.guardarTraspaso(placa, dpiAnt, nombreAnt, fecha, dpiNew, nombreNew, departamento, informacionMT)) {
-        JOptionPane.showMessageDialog(this, "Traspaso guardado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        this.dispose();
-    }
+        if (modoModificar) {
+            if (listaTraspasos.actualizarTraspaso(placa, dpiAntOriginal, nombreAntOriginal, fechaOriginal, dpiNewOriginal, nombreNewOriginal,
+                                                  dpiAnt, nombreAnt, fecha, dpiNew, nombreNew, departamento, informacionMT)) {
+                JOptionPane.showMessageDialog(this, "Traspaso modificado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+            }
+        } else {
+            if (listaTraspasos.guardarTraspaso(placa, dpiAnt, nombreAnt, fecha, dpiNew, nombreNew, departamento, informacionMT)) {
+                JOptionPane.showMessageDialog(this, "Traspaso guardado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+            }
+        }
 
     }//GEN-LAST:event_jButton2ActionPerformed
 

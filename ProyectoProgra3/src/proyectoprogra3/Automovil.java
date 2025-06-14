@@ -7,23 +7,46 @@ import java.io.IOException;
 
 public class Automovil extends javax.swing.JFrame {
     private InformacionMT informacionMT;
-    private RegistroVehiculosGT parent; // Referencia al padre
+    private RegistroVehiculosGT parent;
+    private boolean modoModificar;
+    private String placaOriginal; // Para mantener la placa original en modo modificar
 
     public Automovil(RegistroVehiculosGT parent) {
+        this(parent, false, null, null, null, null, null, 0, null);
+    }
+
+    public Automovil(RegistroVehiculosGT parent, boolean modoModificar, String placa, String dpi, String nombre,
+                     String marca, String modelo, int ano, String departamento) {
         this.parent = parent;
+        this.modoModificar = modoModificar;
+        this.placaOriginal = placa;
         initComponents();
-        // Inicializar InformacionMT
         String rutaCarpeta = "C:\\Users\\Mayby\\Desktop\\SIRVE_Datos_Vehiculos DataSet - copia";
         informacionMT = new InformacionMT(rutaCarpeta);
-        // Limpiar los campos de texto
-        jTextField1.setText("");
-        jTextField2.setText("");
-        jTextField3.setText("");
-        jTextField4.setText("");
-        jTextField5.setText("");
-        jTextField6.setText("");
-        // Establecer cierre como DISPOSE para no cerrar toda la aplicación
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        // Configurar título y botón según el modo
+        jLabel1.setText(modoModificar ? "Modificar Vehículo" : "Nuevo Vehículo");
+        jButton2.setText(modoModificar ? "Modificar" : "Guardar");
+
+        // Precargar datos en modo modificar
+        if (modoModificar) {
+            jTextField1.setText(placa);
+            jTextField2.setText(dpi);
+            jTextField3.setText(nombre);
+            jTextField4.setText(marca);
+            jTextField5.setText(modelo);
+            jTextField6.setText(String.valueOf(ano));
+            jComboBox1.setSelectedItem(departamento);
+            jTextField1.setEditable(false); // Placa no editable en modo modificar
+        } else {
+            jTextField1.setText("");
+            jTextField2.setText("");
+            jTextField3.setText("");
+            jTextField4.setText("");
+            jTextField5.setText("");
+            jTextField6.setText("");
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -233,7 +256,6 @@ public class Automovil extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // Obtener datos de los campos
         String placa = jTextField1.getText().trim();
         String dpi = jTextField2.getText().trim();
         String nombre = jTextField3.getText().trim();
@@ -249,11 +271,11 @@ public class Automovil extends javax.swing.JFrame {
             return;
         }
 
-        // Validar año como número
+        // Validar año
         int ano;
         try {
             ano = Integer.parseInt(anoStr);
-            if (ano < 1900 || ano > 2025) { // Ajustar rango según necesidad
+            if (ano < 1900 || ano > 2025) {
                 JOptionPane.showMessageDialog(this, "Año inválido. Debe estar entre 1900 y 2025.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -262,19 +284,35 @@ public class Automovil extends javax.swing.JFrame {
             return;
         }
 
-        // Verificar si la placa ya existe
-        if (informacionMT.existePlaca(departamento, placa)) {
-            JOptionPane.showMessageDialog(this, "Ya existe un vehículo con la placa " + placa + " en " + departamento, "Error", JOptionPane.ERROR_MESSAGE);
+        // Validar placa
+        if (!modoModificar && !placa.matches("[A-Z]{3,4}-[0-9]{3,4}")) {
+            JOptionPane.showMessageDialog(this, "Placa inválida. Debe ser 3 o 4 letras mayúsculas, un guion, y 3 o 4 dígitos (ej. ZZAB-102, KYT-9063).", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Guardar el vehículo
-        if (informacionMT.guardarVehiculo(departamento, placa, dpi, nombre, marca, modelo, ano)) {
-            JOptionPane.showMessageDialog(this, "Vehículo guardado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            
-            parent.recargarArboles(); // Notificar al padre
+        if (modoModificar) {
+            // Modificar vehículo
+            if (informacionMT.actualizarVehiculo(departamento, placaOriginal, dpi, nombre, marca, modelo, ano)) {
+                JOptionPane.showMessageDialog(this, "Vehículo modificado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                parent.recargarArboles();
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al modificar el vehículo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
-            JOptionPane.showMessageDialog(this, "Error al guardar el vehículo.", "Error", JOptionPane.ERROR_MESSAGE);
+            // Agregar vehículo
+            if (informacionMT.existePlaca(departamento, placa)) {
+                JOptionPane.showMessageDialog(this, "Ya existe un vehículo con la placa " + placa + " en " + departamento, "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (informacionMT.guardarVehiculo(departamento, placa, dpi, nombre, marca, modelo, ano)) {
+                JOptionPane.showMessageDialog(this, "Vehículo guardado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                parent.recargarArboles();
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al guardar el vehículo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 

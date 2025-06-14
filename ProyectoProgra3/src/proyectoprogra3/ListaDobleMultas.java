@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListaDobleMultas {
     private NodoMulta primero;
@@ -66,10 +68,91 @@ public class ListaDobleMultas {
             }
 
             insertar(placa, fecha, descripcion, monto);
-            informacionMT.actualizarVehiculoMulta(departamento, placa, 1); // Incrementar multas
+            informacionMT.actualizarVehiculoMulta(departamento, placa, 1);
             return true;
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Monto inválido: " + montoStr, "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
+    public boolean actualizarMulta(String placa, String fechaAnt, String descAnt, double montoAnt, 
+                                   String fechaNew, String descNew, String montoNewStr, String departamento, InformacionMT informacionMT) {
+        try {
+            double montoNew = Double.parseDouble(montoNewStr.trim());
+            if (fechaNew.isEmpty() || descNew.isEmpty() || montoNewStr.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
+            NodoMulta actual = primero;
+            boolean foundInMemory = false;
+            while (actual != null) {
+                if (actual.placa.equals(placa) && 
+                    actual.fecha.equals(fechaAnt) && 
+                    actual.descripcion.equals(descAnt) && 
+                    Math.abs(actual.monto - montoAnt) < 0.01) {
+                    foundInMemory = true;
+                    actual.fecha = fechaNew;
+                    actual.descripcion = descNew;
+                    actual.monto = montoNew;
+                    break;
+                }
+                actual = actual.siguiente;
+            }
+
+            String rutaArchivo = "C:\\Users\\Mayby\\Desktop\\SIRVE_Datos_Vehiculos DataSet - copia\\" + 
+                                departamento + "\\" + departamento + "_multas.txt";
+            File inputFile = new File(rutaArchivo);
+            File tempFile = new File(rutaArchivo + ".tmp");
+
+            if (!inputFile.exists()) {
+                JOptionPane.showMessageDialog(null, "El archivo de multas no existe: " + rutaArchivo, "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
+            boolean foundInFile = false;
+            try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+                 BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] datos = line.split(",");
+                    if (datos.length == 4 && 
+                        datos[0].trim().equals(placa) &&
+                        datos[1].trim().equals(fechaAnt) &&
+                        datos[2].trim().equals(descAnt) &&
+                        Math.abs(Double.parseDouble(datos[3].trim()) - montoAnt) < 0.01) {
+                        foundInFile = true;
+                        writer.write(String.format("%s,%s,%s,%.2f%n", placa, fechaNew, descNew, montoNew));
+                    } else {
+                        writer.write(line + "\n");
+                    }
+                }
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Error al actualizar la multa en el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                tempFile.delete();
+                return false;
+            }
+
+            if (!foundInFile) {
+                JOptionPane.showMessageDialog(null, "Multa no encontrada en el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
+                tempFile.delete();
+                return false;
+            }
+
+            if (!inputFile.delete()) {
+                JOptionPane.showMessageDialog(null, "No se pudo eliminar el archivo original.", "Error", JOptionPane.ERROR_MESSAGE);
+                tempFile.delete();
+                return false;
+            }
+            if (!tempFile.renameTo(inputFile)) {
+                JOptionPane.showMessageDialog(null, "No se pudo renombrar el archivo temporal.", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
+            return true;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Monto inválido: " + montoNewStr, "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }
@@ -78,7 +161,6 @@ public class ListaDobleMultas {
         try {
             double monto = Double.parseDouble(montoStr.trim());
 
-            // Remove from in-memory list
             NodoMulta actual = primero;
             boolean foundInMemory = false;
             while (actual != null) {
@@ -102,7 +184,6 @@ public class ListaDobleMultas {
                 actual = actual.siguiente;
             }
 
-            // Remove from file
             String rutaArchivo = "C:\\Users\\Mayby\\Desktop\\SIRVE_Datos_Vehiculos DataSet - copia\\" + 
                                 departamento + "\\" + departamento + "_multas.txt";
             File inputFile = new File(rutaArchivo);
@@ -125,7 +206,7 @@ public class ListaDobleMultas {
                         datos[2].trim().equals(descripcion) &&
                         Math.abs(Double.parseDouble(datos[3].trim()) - monto) < 0.01) {
                         foundInFile = true;
-                        continue; // Skip the line to delete it
+                        continue;
                     }
                     writer.write(line + "\n");
                 }
@@ -151,7 +232,7 @@ public class ListaDobleMultas {
                 return false;
             }
 
-            informacionMT.actualizarVehiculoMulta(departamento, placa, -1); // Decrementar multas
+            informacionMT.actualizarVehiculoMulta(departamento, placa, -1);
             return true;
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Monto inválido: " + montoStr, "Error", JOptionPane.ERROR_MESSAGE);
@@ -174,5 +255,15 @@ public class ListaDobleMultas {
         }
         totalMultasField.setText(String.valueOf(totalMultas));
         sumaMontosField.setText(String.format("%.2f", sumaMontos));
+    }
+
+    public List<Multa> getAllMultas() {
+        List<Multa> multas = new ArrayList<>();
+        NodoMulta actual = primero;
+        while (actual != null) {
+            multas.add(new Multa(actual.placa, actual.fecha, actual.descripcion, actual.monto));
+            actual = actual.siguiente;
+        }
+        return multas;
     }
 }

@@ -21,7 +21,6 @@ public class Informacion extends javax.swing.JFrame {
         this.currentDepartamento = departamento;
         jLabel2.setText("Vehículo: " + placa + " - " + departamento);
         refreshTables();
-        
     }
 
     private void refreshTables() {
@@ -62,6 +61,8 @@ public class Informacion extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -163,6 +164,20 @@ public class Informacion extends javax.swing.JFrame {
             }
         });
 
+        jButton5.setText("Modificar Multas");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
+        jButton6.setText("Modificar Traspasos");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -190,8 +205,10 @@ public class Informacion extends javax.swing.JFrame {
                             .addComponent(jButton2)
                             .addComponent(jLabel3)
                             .addComponent(jButton3)
-                            .addComponent(jButton4))))
-                .addContainerGap(30, Short.MAX_VALUE))
+                            .addComponent(jButton4)
+                            .addComponent(jButton6)
+                            .addComponent(jButton5))))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -218,7 +235,8 @@ public class Informacion extends javax.swing.JFrame {
                         .addComponent(jButton1)
                         .addGap(5, 5, 5)
                         .addComponent(jButton3)
-                        .addGap(28, 28, 28)))
+                        .addGap(5, 5, 5)
+                        .addComponent(jButton5)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -232,6 +250,8 @@ public class Informacion extends javax.swing.JFrame {
                         .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(Regresar)))
                 .addGap(18, 18, 18))
@@ -296,6 +316,7 @@ public class Informacion extends javax.swing.JFrame {
         public void windowClosed(java.awt.event.WindowEvent windowEvent) {
             refreshTables();
         }
+        
     });
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -367,6 +388,64 @@ public class Informacion extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        if (currentPlaca == null || currentDepartamento == null) {
+            JOptionPane.showMessageDialog(this, "Seleccione un vehículo primero.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int selectedRow = jTable2.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione una multa para modificar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String fecha = jTable2.getValueAt(selectedRow, 1).toString().trim();
+        String descripcion = jTable2.getValueAt(selectedRow, 2).toString().trim();
+        double monto = Double.parseDouble(jTable2.getValueAt(selectedRow, 3).toString().trim());
+
+        informacionMT.cargarMultas(currentDepartamento);
+        ListaDobleMultas listaMultas = informacionMT.getMultasPorDepartamento(currentDepartamento);
+        Multas modificarMulta = new Multas(currentPlaca, currentDepartamento, listaMultas, informacionMT, true, fecha, descripcion, monto);
+        modificarMulta.setVisible(true);
+        modificarMulta.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                refreshTables();
+            }
+        });
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        if (currentPlaca == null || currentDepartamento == null) {
+            JOptionPane.showMessageDialog(this, "Seleccione un vehículo primero.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int selectedRow = jTable3.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un traspaso para modificar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String dpiAnt = jTable3.getValueAt(selectedRow, 1).toString().trim();
+        String nombreAnt = jTable3.getValueAt(selectedRow, 2).toString().trim();
+        String fecha = jTable3.getValueAt(selectedRow, 3).toString().trim();
+        String dpiNew = jTable3.getValueAt(selectedRow, 4).toString().trim();
+        String nombreNew = jTable3.getValueAt(selectedRow, 5).toString().trim();
+
+        informacionMT.cargarTraspasos(currentDepartamento);
+        ListaCircularTraspasos listaTraspasos = informacionMT.getTraspasosPorDepartamento(currentDepartamento);
+        Traspasos modificarTraspaso = new Traspasos(currentPlaca, currentDepartamento, listaTraspasos, informacionMT, true, dpiAnt, nombreAnt, fecha, dpiNew, nombreNew);
+        modificarTraspaso.setVisible(true);
+        modificarTraspaso.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                refreshTables();
+            }
+        });
+    }//GEN-LAST:event_jButton6ActionPerformed
+
     
      public static void main(String args[]) {
         try {
@@ -394,6 +473,8 @@ public class Informacion extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

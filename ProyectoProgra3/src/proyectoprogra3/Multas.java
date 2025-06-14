@@ -3,24 +3,47 @@ package proyectoprogra3;
 import javax.swing.JOptionPane;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class Multas extends javax.swing.JFrame {
     private String placa;
     private String departamento;
     private ListaDobleMultas listaMultas;
+    private InformacionMT informacionMT;
+    private boolean modoModificar;
+    private String fechaOriginal;
+    private String descOriginal;
+    private double montoOriginal;
 
     public Multas(String placa, String departamento, ListaDobleMultas listaMultas) {
+        this(placa, departamento, listaMultas, null, false, null, null, 0.0);
+    }
+
+    public Multas(String placa, String departamento, ListaDobleMultas listaMultas, InformacionMT informacionMT, 
+                  boolean modoModificar, String fecha, String descripcion, double monto) {
         this.placa = placa;
         this.departamento = departamento;
         this.listaMultas = listaMultas;
+        this.informacionMT = informacionMT != null ? informacionMT : new InformacionMT("C:\\Users\\Mayby\\Desktop\\SIRVE_Datos_Vehiculos DataSet - copia");
+        this.modoModificar = modoModificar;
+        this.fechaOriginal = fecha;
+        this.descOriginal = descripcion;
+        this.montoOriginal = monto;
         initComponents();
         jTextField1.setText(placa);
         jTextField1.setEditable(false);
-        // Establecer la fecha actual en jTextField2 (formato YYYY-MM-DD)
-        LocalDate fechaActual = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        jTextField2.setText(fechaActual.format(formatter));
+        if (modoModificar) {
+            jLabel1.setText("Modificar Multa");
+            jButton1.setText("Modificar");
+            jTextField2.setText(fecha);
+            jTextField3.setText(descripcion);
+            jTextField4.setText(String.format("%.2f", monto));
+        } else {
+            LocalDate fechaActual = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            jTextField2.setText(fechaActual.format(formatter));
+            jTextField3.setText("");
+            jTextField4.setText("");
+        }
         setLocationRelativeTo(null);
     }
 
@@ -52,8 +75,6 @@ public class Multas extends javax.swing.JFrame {
         jLabel4.setText("DESCRIPCION");
 
         jLabel5.setText("MONTO");
-
-        jTextField4.setText("jTextField4");
 
         jButton1.setText("Guardar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -87,21 +108,17 @@ public class Multas extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton1))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel5))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jTextField4, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
+                                    .addComponent(jTextField3)
+                                    .addComponent(jTextField2)
+                                    .addComponent(jTextField1))))))
                 .addGap(207, 207, 207))
         );
         layout.setVerticalGroup(
@@ -142,31 +159,21 @@ public class Multas extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
                                          
     String fecha = jTextField2.getText().trim();
-    String descripcion = jTextField3.getText().trim();
-    String montoStr = jTextField4.getText().trim();
+        String descripcion = jTextField3.getText().trim();
+        String montoStr = jTextField4.getText().trim();
 
-    // Validar formato de fecha (yyyy-MM-dd)
-    try {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate.parse(fecha, formatter);
-    } catch (DateTimeParseException e) {
-        JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use yyyy-MM-dd.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    // Validar fecha (yyyy-MM-dd)
-    try {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate.parse(fecha, formatter);
-    } catch (DateTimeParseException e) {
-        JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use yyyy-MM-dd (ej. 2023-10-25).", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
-    if (listaMultas.guardarMulta(placa, fecha, descripcion, montoStr, departamento, 
-        new InformacionMT("C:\\Users\\Mayby\\Desktop\\SIRVE_Datos_Vehiculos DataSet - copia"))) {
-        JOptionPane.showMessageDialog(this, "Multa guardada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        this.dispose();
-    }
+        if (modoModificar) {
+            if (listaMultas.actualizarMulta(placa, fechaOriginal, descOriginal, montoOriginal, fecha, descripcion, montoStr, departamento, informacionMT)) {
+                JOptionPane.showMessageDialog(this, "Multa modificada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+            }
+        } else {
+            if (listaMultas.guardarMulta(placa, fecha, descripcion, montoStr, departamento, informacionMT)) {
+                JOptionPane.showMessageDialog(this, "Multa guardada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                
+                this.dispose();
+            }
+        }
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
