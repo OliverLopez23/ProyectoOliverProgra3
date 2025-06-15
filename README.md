@@ -1,156 +1,165 @@
-# ProyectoOliverProgra3
-Proyecto del Curso de Programación III de la UMG 5to semestre
+# Technical Manual for Vehicle Registry System
 
-# Manual de Usuario del Sistema de Registro Vehicular
+## Introduction
+The Vehicle Registry System is a Java-based desktop application for managing vehicle records, fines, and transfers in Guatemala, with statistical analysis capabilities. This manual provides developers with an overview of the system’s architecture, class structure, and instructions for maintenance and extension.
 
-## Introducción
-El Sistema de Registro Vehicular es una aplicación de escritorio diseñada para gestionar los registros de vehículos en Guatemala, incluyendo multas y traspasos de propiedad, y para proporcionar análisis estadísticos. Este manual guía a los usuarios en el acceso y uso de las funcionalidades de la aplicación.
+## System Overview
+- **Purpose**: Manage vehicle data (fines, transfers, vehicle details) across departments and provide statistics (e.g., top fined vehicles, search performance).
+- **Technology Stack**:
+  - **Language**: Java (JDK 8+).
+  - **GUI Framework**: Swing.
+  - **Data Storage**: Text files in `C:\Users\Mayby\Desktop\SIRVE_Datos_Vehiculos DataSet - copia\<department>`.
+  - **Data Structures**: Doubly linked lists (`ListaDobleMultas`), circular linked lists (`ListaCircularTraspasos`), binary search trees (`Arboles`), AVL trees (`ArbolesAVL`).
+- **Key Features**:
+  - CRUD operations for fines and transfers.
+  - Statistical reports (top 10 fines/transfers, busiest month, search algorithm performance).
+  - File-based persistence per department.
 
-## Requisitos del Sistema
-- **Sistema Operativo**: Windows (probado en Windows 10/11).
-- **Entorno de Ejecución Java**: JRE 8 o superior.
-- **Espacio en Disco**: Al menos 100 MB para archivos de datos.
-- **Carpeta de Datos**: Asegúrese de que exista la carpeta `C:\Users\Mayby\Desktop\SIRVE_Datos_Vehiculos DataSet - copia` con subcarpetas para cada departamento (por ejemplo, `Guatemala`, `Quetzaltenango`) que contengan archivos como `<departamento>_multas.txt`, `<departamento>_traspasos.txt` y `<departamento>_vehiculos.txt`.
+## System Architecture
+- **Layered Design**:
+  - **Presentation Layer**: Swing JFrames (`RegistroVehiculosGT`, `Estadistica`) for user interaction.
+  - **Business Logic Layer**: Classes like `MetEstadistica`, `InformacionMT` handle data processing and statistics.
+  - **Data Access Layer**: `ListaDobleMultas`, `ListaCircularTraspasos`, `Arboles`, `ArbolesAVL` manage data storage and retrieval.
+- **Data Flow**:
+  - User inputs via `RegistroVehiculosGT` trigger operations (e.g., add fine, view stats).
+  - `InformacionMT` reads/writes text files and updates in-memory structures.
+  - `MetEstadistica` processes data for statistical reports displayed in `Estadistica`.
+- **File Structure**:
+  - Each department has a subfolder (e.g., `Guatemala`).
+  - Files: `<department>_multas.txt` (fines), `<department>_traspasos.txt` (transfers), `<department>_vehiculos.txt` (vehicles).
+  - File formats:
+    - Fines: `placa,fecha,descripcion,monto` (e.g., `ABC123,2023-05-01,Speeding,500.00`).
+    - Transfers: `placa,dpiAnt,nombreAnt,fecha,dpiNew,nombreNew` (e.g., `ABC123,123456789,John Doe,2023-05-01,987654321,Jane Doe`).
 
-## Primeros Pasos
-1. **Iniciar la Aplicación**:
-   - Haga doble clic en el archivo JAR ejecutable o ejecute `java -jar VehicleRegistry.jar` desde la línea de comandos.
-   - Se abrirá la ventana principal (`RegistroVehiculosGT`).
+## Class Structure
+### Core Classes
+1. **RegistroVehiculosGT**:
+   - **Purpose**: Main JFrame for user interaction.
+   - **Key Features**:
+     - “Mirar Estadística” button opens `Estadistica`.
+     - (Assumed) UI for managing fines/transfers.
+   - **Dependencies**: `Estadistica`.
+2. **Estadistica**:
+   - **Purpose**: JFrame displaying statistical reports.
+   - **Components**:
+     - Tables for top 10 fines/transfers.
+     - Text fields for busiest month and algorithm performance.
+   - **Dependencies**: `MetEstadistica`, `InformacionMT`, `Arboles`, `ArbolesAVL`.
+3. **MetEstadistica**:
+   - **Purpose**: Handles statistical computations.
+   - **Methods**:
+     - `llenarTablaMultas`: Populates top 10 fines table.
+     - `llenarTablaTraspasos`: Populates top 10 transfers table.
+     - `encontrarMesConMasMovimientos`: Finds month with most fines/transfers.
+     - `calcularTiemposPromedio`: Measures ABB/AVL search times.
+   - **Dependencies**: `InformacionMT`, `Arboles`, `ArbolesAVL`, `ListaDobleMultas`, `ListaCircularTraspasos`, `Multa`, `Traspaso`.
+4. **ListaDobleMultas**:
+   - **Purpose**: Manages fines using a doubly linked list.
+   - **Key Methods**:
+     - `insertar`: Adds a fine.
+     - `guardarMulta`, `actualizarMulta`, `eliminarMulta`: CRUD operations with file persistence.
+     - `getAllMultas`: Returns `List<Multa>` for statistics.
+   - **Dependencies**: `InformacionMT`, `Multa`.
+5. **ListaCircularTraspasos**:
+   - **Purpose**: Manages transfers using a circular linked list.
+   - **Key Methods**:
+     - `insertar`: Adds a transfer.
+     - `guardarTraspaso`, `actualizarTraspaso`, `eliminarTraspaso`: CRUD operations.
+     - `getAllTraspasos`: Returns `List<Traspaso>`.
+   - **Dependencies**: `InformacionMT`, `Traspaso`.
+6. **Multa**:
+   - **Purpose**: DTO for fine data (placa, fecha, descripcion, monto).
+7. **Traspaso**:
+   - **Purpose**: DTO for transfer data (placa, dpiAnt, nombreAnt, fecha, dpiNew, nombreNew).
+8. **InformacionMT** (Inferred):
+   - **Purpose**: Manages file I/O and coordinates data across departments.
+   - **Assumed Methods**:
+     - `cargarMultas`, `cargarTraspasos`: Load data from files.
+     - `getMultasPorDepartamento`, `getTraspasosPorDepartamento`: Access in-memory data.
+     - `actualizarVehiculoMulta`, `actualizarVehiculoTraspaso`: Update vehicle records.
+9. **Arboles** (Inferred):
+   - **Purpose**: Binary search tree for vehicle searches.
+   - **Assumed Methods**:
+     - `leerArchivos`: Loads vehicle data.
+     - `buscarPorPlaca`: Searches by license plate.
+     - `inOrden`: Populates table with vehicle data.
+10. **ArbolesAVL** (Inferred):
+    - **Purpose**: AVL tree for balanced vehicle searches.
+    - **Assumed Methods**: Similar to `Arboles`.
 
-2. **Descripción de la Ventana Principal**:
-   - La ventana principal brinda acceso a las funciones de gestión de vehículos y a un botón para ver estadísticas.
-   - Función clave: botón **"Mirar Estadística"** para abrir el panel de estadísticas.
+### Dependencies
+- **External Libraries**: None (standard Java libraries: `javax.swing`, `java.io`, `java.time`, `java.util`).
+- **Internal Dependencies**:
+  - `Estadistica` → `MetEstadistica` → `InformacionMT`, `ListaDobleMultas`, `ListaCircularTraspasos`, `Arboles`, `ArbolesAVL`.
+  - `RegistroVehiculosGT` → `Estadistica`.
 
-## Visualización de Estadísticas
-1. **Abrir el Panel de Estadísticas**:
-   - En la ventana principal, haga clic en el botón **"Mirar Estadística"**.
-   - Se abrirá una nueva ventana (`Estadistica`) con informes estadísticos.
-
-2. **Características del Panel de Estadísticas**:
-   - **Top 10 Vehículos con Más Multas**:
-     - Tabla con los 10 vehículos con más multas, mostrando:
-       - Posición (1–10)
-       - Placa
-       - Número de Multas
-       - Monto Total de Multas
-       - Departamento
-
-   - **Top 10 Vehículos con Más Traspasos**:
-     - Tabla con los 10 vehículos con más traspasos de propiedad, mostrando:
-       - Posición (1–10)
-       - Placa
-       - Número de Traspasos
-       - Departamento
-
-   - **Mes con Más Movimientos**:
-     - Muestra el mes (ej. `2023-05`) con el mayor número combinado de multas y traspasos.
-     - Muestra el total de movimientos de ese mes.
-
-   - **Rendimiento del Algoritmo**:
-     - Muestra métricas de rendimiento de búsqueda para dos estructuras de datos (ABB y árboles AVL):
-       - Tiempo máximo de búsqueda ABB (µs)
-       - Tiempo mínimo de búsqueda ABB (µs)
-       - Tiempo promedio de búsqueda ABB (µs)
-       - Tiempo promedio de búsqueda AVL (µs)
-
-3. **Cerrar el Panel**:
-   - Haga clic en el botón cerrar (X) de la ventana `Estadistica` para regresar a la ventana principal.
-
-## Gestión de Datos de Vehículos
-**Nota**: Este manual asume que la gestión de datos (por ejemplo, agregar multas/traspasos) se realiza a través de `RegistroVehiculosGT`. Como no se proporcionaron detalles específicos de la interfaz, se da una guía general.
-
-1. **Agregar Multas**:
-   - Navegue a la sección de multas en la ventana principal (si está disponible).
-   - Ingrese los datos: placa, fecha (AAAA-MM-DD), descripción, monto y departamento.
-   - Guarde la multa; se registrará en `<departamento>_multas.txt`.
-
-2. **Agregar Traspasos**:
-   - Navegue a la sección de traspasos.
-   - Ingrese los datos: placa, DPI/nombre del dueño anterior, fecha, DPI/nombre del nuevo dueño y departamento.
-   - Guarde el traspaso; se registrará en `<departamento>_traspasos.txt`.
-
-3. **Actualizar/Eliminar Datos**:
-   - Use los controles de la interfaz para localizar y modificar multas o traspasos existentes.
-   - Confirme los cambios para actualizar los archivos de texto correspondientes.
-
-## Resolución de Problemas
-- **Panel de Estadísticas Vacío**:
-  - Asegúrese de que la carpeta de datos contenga archivos válidos.
-  - Verifique que los archivos sigan el formato correcto (ej. `placa,fecha,descripcion,monto` para multas).
-
-- **Errores en la Aplicación**:
-  - Verifique que Java esté instalado y actualizado.
-  - Revise los permisos de los archivos en la carpeta de datos.
-
-- **Datos Inválidos**:
-  - Asegúrese de que las fechas tengan formato `AAAA-MM-DD` y los montos sean numéricos.
-
-- **Soporte Técnico**:
-  - Para problemas, contacte al administrador del sistema o al equipo de desarrollo.
-
-## Glosario
-- **Multa**: Sanción registrada contra un vehículo.
-- **Traspaso**: Cambio de propiedad de un vehículo.
-- **ABB/AVL**: Estructuras de datos utilizadas para búsquedas eficientes.
-- **Departamento**: Región administrativa en Guatemala (ej. Guatemala, Sacatepéquez).
-
-## Versión
-- **Versión 1.0** (Junio 2025)
-- Desarrollado por [Tu Nombre o Nombre del Equipo].
-
-# Manual Técnico del Sistema de Registro Vehicular
-
-## Introducción
-El Sistema de Registro Vehicular es una aplicación de escritorio basada en Java para gestionar registros de vehículos, multas y traspasos en Guatemala, con capacidades de análisis estadístico. Este manual ofrece a los desarrolladores una visión general de la arquitectura del sistema, estructura de clases e instrucciones de mantenimiento y extensión.
-
-## Visión General del Sistema
-- **Propósito**: Gestionar datos vehiculares (multas, traspasos, detalles de vehículos) por departamentos y generar estadísticas.
-- **Tecnologías Utilizadas**:
-  - **Lenguaje**: Java (JDK 8+).
-  - **Interfaz Gráfica**: Swing.
-  - **Almacenamiento**: Archivos de texto en `C:\Users\Mayby\Desktop\SIRVE_Datos_Vehiculos DataSet - copia\<departamento>`.
-  - **Estructuras de Datos**: Listas dobles (`ListaDobleMultas`), listas circulares (`ListaCircularTraspasos`), árboles binarios de búsqueda (`Arboles`), árboles AVL (`ArbolesAVL`).
-
-- **Características Principales**:
-  - Operaciones CRUD para multas y traspasos.
-  - Informes estadísticos.
-  - Persistencia de datos por archivo por departamento.
-
-## Arquitectura del Sistema
-- **Diseño por Capas**:
-  - **Capa de Presentación**: JFrames de Swing (`RegistroVehiculosGT`, `Estadistica`).
-  - **Lógica de Negocio**: Clases como `MetEstadistica`, `InformacionMT`.
-  - **Acceso a Datos**: `ListaDobleMultas`, `ListaCircularTraspasos`, `Arboles`, `ArbolesAVL`.
-
-- **Flujo de Datos**:
-  - El usuario interactúa con `RegistroVehiculosGT`.
-  - `InformacionMT` lee/escribe archivos de texto.
-  - `MetEstadistica` procesa datos para mostrar en `Estadistica`.
-
-- **Estructura de Archivos**:
-  - Subcarpetas por departamento (ej. `Guatemala`).
-  - Archivos:
-    - Multas: `placa,fecha,descripcion,monto`
-    - Traspasos: `placa,dpiAnt,nombreAnt,fecha,dpiNew,nombreNew`
-
-## Estructura de Clases
-### Clases Principales
-1. **RegistroVehiculosGT**: Ventana principal. Acceso a estadísticas y gestión.
-2. **Estadistica**: Muestra los informes.
-3. **MetEstadistica**: Computa estadísticas.
-4. **ListaDobleMultas**: Maneja multas con lista doblemente enlazada.
-5. **ListaCircularTraspasos**: Maneja traspasos con lista circular.
-6. **Multa** y **Traspaso**: DTOs con datos de multa/traspaso.
-7. **InformacionMT**: Carga y gestiona archivos.
-8. **Arboles / ArbolesAVL**: Árboles de búsqueda y búsqueda balanceada.
-
-### Dependencias
-- Librerías externas: Ninguna (Java estándar).
-- Relación entre clases:
-  - `RegistroVehiculosGT` → `Estadistica` → `MetEstadistica` → datos
-
-## Instalación y Configuración
-1. **Clonar Repositorio**:
+## Installation and Setup
+1. **Clone the Repository**:
    ```bash
-   git clone <url-repositorio>
+   git clone <repository-url>
    ```
+2. **Set Up Data Folder**:
+   - Create `C:\Users\Mayby\Desktop\SIRVE_Datos_Vehiculos DataSet - copia`.
+   - Add subfolders for departments (e.g., `Guatemala`).
+   - Populate with text files following the specified formats.
+3. **Compile and Run**:
+   - Use an IDE (e.g., NetBeans, IntelliJ) or command line:
+     ```bash
+     javac -d bin src/proyectoprogra3/*.java
+     java -cp bin proyectoprogra3.RegistroVehiculosGT
+     ```
+4. **Package as JAR**:
+   ```bash
+   jar cfm VehicleRegistry.jar Manifest.txt -C bin .
+   ```
+   - `Manifest.txt`: `Main-Class: proyectoprogra3.RegistroVehiculosGT`.
+
+## Maintenance Instructions
+1. **Adding New Statistics**:
+   - Extend `MetEstadistica` with new methods (e.g., `calcularPromedioMultasPorDepartamento`).
+   - Update `Estadistica` UI to display new data (add tables/text fields).
+2. **Modifying Data Structures**:
+   - Replace `Arboles`/`ArbolesAVL` with alternative structures (e.g., hash tables) by updating `MetEstadistica`’s `calcularTiemposPromedio`.
+   - Ensure new structures support `buscarPorPlaca` and `inOrden`.
+3. **Improving File I/O**:
+   - Replace text files with a database (e.g., SQLite) by modifying `InformacionMT`.
+   - Update `ListaDobleMultas`/`ListaCircularTraspasos` to use database queries.
+4. **Error Handling**:
+   - Add try-catch blocks in `MetEstadistica` for file access errors.
+   - Enhance `JOptionPane` messages in `ListaDobleMultas`/`ListaCircularTraspasos` for user feedback.
+5. **Performance Optimization**:
+   - Cache department data in `InformacionMT` to reduce file reads.
+   - Use concurrent data structures for large datasets.
+
+## Extending the System
+1. **New Features**:
+   - **Vehicle Search UI**: Add a search panel in `RegistroVehiculosGT` using `Arboles.buscarPorPlaca`.
+   - **Data Export**: Add export functionality in `Estadistica` to save tables as CSV.
+2. **New Data Types**:
+   - Create new classes (e.g., `ListaAccidentes`) similar to `ListaDobleMultas`.
+   - Update `InformacionMT` to handle new file types.
+3. **UI Enhancements**:
+   - Use JavaFX for a modern UI, replacing Swing.
+   - Add charts (e.g., JFreeChart) in `Estadistica` for visual statistics.
+
+## Known Issues
+- **Hardcoded Path**: Data folder path is hardcoded; consider a configuration file.
+- **No Singleton for Estadistica**: Multiple `Estadistica` windows can open; implement a singleton pattern if needed.
+- **File Format Sensitivity**: Invalid file formats (e.g., malformed dates) may cause errors; add robust parsing.
+
+## Testing
+- **Unit Tests**:
+  - Test `MetEstadistica` methods with mock `InformacionMT` data.
+  - Use JUnit for `ListaDobleMultas`/`ListaCircularTraspasos` CRUD operations.
+- **Integration Tests**:
+  - Verify `Estadistica` tables populate correctly with sample data.
+  - Test file I/O with various department configurations.
+- **Sample Data**:
+  - Create test files in `C:\Users\Mayby\Desktop\SIRVE_Datos_Vehiculos DataSet - copia\Guatemala` with 100+ records.
+
+## Version
+- **Version 1.0** (June 2025)
+- Developed by [Your Name/Team Name].
+
+## Contact
+- For technical support, contact the development team at [your-email@example.com].
